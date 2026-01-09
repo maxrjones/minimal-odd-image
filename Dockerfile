@@ -17,31 +17,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     rm /tmp/apt.txt
 
-# Insall quarto
-USER root
-RUN wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.57/quarto-1.5.57-linux-amd64.deb
-RUN dpkg -i quarto-1.5.57-linux-amd64.deb
-
-
-# Install rustup
-ENV RUSTUP_HOME="/opt/.rustup"
-ENV CARGO_HOME="/opt/.cargo"
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="${CARGO_HOME}/bin:${PATH}"
-RUN rustup component add rust-src
-
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install
 
 USER ${NB_UID}
-# Update cargo home for users
-ENV CARGO_HOME="${HOME}/.cargo"
-ENV PATH="${CARGO_HOME}/bin:${PATH}"
-
-# Install from main branches of key libraries
-RUN python -m pip install --no-cache-dir \
-    git+https://github.com/zarr-developers/zarr-python.git \
-    git+https://github.com/zarr-developers/VirtualiZarr.git \
-    git+https://github.com/fsspec/kerchunk.git \
-    git+https://github.com/earth-mover/icechunk#subdirectory=icechunk-python
